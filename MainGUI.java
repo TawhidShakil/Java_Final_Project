@@ -129,6 +129,14 @@ public class MainGUI {
         btnRetrieve.setForeground(Color.WHITE);
         frame.getContentPane().add(btnRetrieve);
         btnRetrieve.addActionListener(e -> retrieveStudents());
+
+        JButton btnDelete = new JButton("Delete");
+btnDelete.setBounds(530, 320, 100, 30);
+btnDelete.setBackground(Color.RED);
+btnDelete.setForeground(Color.WHITE);
+frame.getContentPane().add(btnDelete);
+btnDelete.addActionListener(e -> deleteStudent());
+
     }
 
     private void saveStudent() {
@@ -225,6 +233,26 @@ private void retrieveStudents() {
     JOptionPane.showMessageDialog(frame, scrollPane, "All Student Information", JOptionPane.INFORMATION_MESSAGE);
 }
 
+private void deleteStudent() {
+    String id = idField.getText();
+
+    for (int i = 0; i < studentList.size(); i++) {
+        if (studentList.get(i).getStudentId().equals(id)) {
+            int confirm = JOptionPane.showConfirmDialog(frame, "Are you sure you want to delete this student?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                studentList.remove(i);
+                saveList();
+                clearForm();
+                isEditMode = false;
+                editingIndex = -1;
+                JOptionPane.showMessageDialog(frame, "Student deleted successfully.");
+            }
+            return;
+        }
+    }
+
+    JOptionPane.showMessageDialog(frame, "Student ID not found.");
+}
 
 
     private void clearForm() {
