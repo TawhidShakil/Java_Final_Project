@@ -1,10 +1,26 @@
 // File: MainGUI.java (Save, Retrieve, Search and Separate Update button with non-overlapping layout)
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Image;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 
 public class MainGUI {
     private JFrame frame;
@@ -170,17 +186,46 @@ public class MainGUI {
         JOptionPane.showMessageDialog(frame, "Student ID not found.");
     }
 
-    private void retrieveStudents() {
-        StringBuilder all = new StringBuilder();
-        for (Student s : studentList) {
-            all.append("Name: ").append(s.getStudentName()).append("\n")
-                .append("ID: ").append(s.getStudentId()).append("\n")
-                .append("Email: ").append(s.getStudentEmail()).append("\n")
-                .append("Phone: ").append(s.getphoneNumber()).append("\n")
-                .append("Course Type: ").append(s.getCourseType()).append("\n\n");
-        }
-        JOptionPane.showMessageDialog(frame, all.toString());
+private void retrieveStudents() {
+    if (studentList.isEmpty()) {
+        JOptionPane.showMessageDialog(frame, "No student data available.");
+        return;
     }
+
+    
+    String[] columnNames = {"Name", "ID", "Email", "Phone", "Course Type"};
+
+    
+    String[][] data = new String[studentList.size()][5];
+    for (int i = 0; i < studentList.size(); i++) {
+        Student s = studentList.get(i);
+        data[i][0] = s.getStudentName();
+        data[i][1] = s.getStudentId();
+        data[i][2] = s.getStudentEmail();
+        data[i][3] = s.getphoneNumber(); 
+        data[i][4] = s.getCourseType().toString();
+    }
+
+    
+    JTable table = new JTable(data, columnNames);
+
+    // 💡 Add these four enhancement lines below
+    table.setShowGrid(true);
+    table.setGridColor(Color.LIGHT_GRAY);
+    table.setFont(new Font("Arial", Font.PLAIN, 14));
+    table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+
+    table.setEnabled(false);
+    table.setRowHeight(25);
+    table.getTableHeader().setReorderingAllowed(false);
+
+    JScrollPane scrollPane = new JScrollPane(table);
+    scrollPane.setPreferredSize(new Dimension(800, 300));
+
+    JOptionPane.showMessageDialog(frame, scrollPane, "All Student Information", JOptionPane.INFORMATION_MESSAGE);
+}
+
+
 
     private void clearForm() {
         nameField.setText("");
