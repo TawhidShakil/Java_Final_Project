@@ -1,8 +1,10 @@
+// File: MainGUI.java (Save, Retrieve, Search and Separate Update button with non-overlapping layout)
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainGUI {
     private JFrame frame;
@@ -12,49 +14,50 @@ public class MainGUI {
     private JTextField phonField;
     private JComboBox<CourseType> courseTypeComboBox;
 
+    private List<Student> studentList = new ArrayList<>();
+    private boolean isEditMode = false;
+    private int editingIndex = -1;
+
     public MainGUI() {
         initialize();
+        loadList();
     }
 
     private void initialize() {
         frame = new JFrame();
-        frame.setBounds(300, 100, 400, 350);
+        frame.setBounds(300, 100, 850, 450);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
-        frame.setPreferredSize(new Dimension(800, 400));
-        frame.pack(); 
         frame.getContentPane().setBackground(Color.BLACK);
 
         Font setFont = new Font("Arial", Font.BOLD,14);
 
         JLabel imageLabel = new JLabel();
-        imageLabel.setBounds(400, 35, 300, 250);  
+        imageLabel.setBounds(470, 35, 300, 250);
         frame.getContentPane().add(imageLabel);
-        ImageIcon icon = new ImageIcon("image.jpg");  
+        ImageIcon icon = new ImageIcon("image.jpg");
         Image image = icon.getImage().getScaledInstance(imageLabel.getWidth(), imageLabel.getHeight(), Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(image));
 
-        JLabel lblNewLabel = new JLabel("Student Name:");
-        lblNewLabel.setBounds(29, 40, 120, 14);
-        lblNewLabel.setFont(setFont);
-        lblNewLabel.setForeground(Color.WHITE);
-        frame.getContentPane().add(lblNewLabel);
+        JLabel lblName = new JLabel("Student Name:");
+        lblName.setBounds(29, 40, 120, 14);
+        lblName.setFont(setFont);
+        lblName.setForeground(Color.WHITE);
+        frame.getContentPane().add(lblName);
 
         nameField = new JTextField();
-        nameField.setBounds(150, 37, 200, 28);
+        nameField.setBounds(150, 37, 250, 28);
         frame.getContentPane().add(nameField);
-        nameField.setColumns(10);
 
-        JLabel lblNewLabel_1 = new JLabel("Student ID:");
-        lblNewLabel_1.setBounds(29, 80, 120, 14);
-        lblNewLabel_1.setFont(setFont);
-        lblNewLabel_1.setForeground(Color.WHITE);
-        frame.getContentPane().add(lblNewLabel_1);
+        JLabel lblId = new JLabel("Student ID:");
+        lblId.setBounds(29, 80, 120, 14);
+        lblId.setFont(setFont);
+        lblId.setForeground(Color.WHITE);
+        frame.getContentPane().add(lblId);
 
         idField = new JTextField();
-        idField.setBounds(150, 77, 200, 28);
+        idField.setBounds(150, 77, 250, 28);
         frame.getContentPane().add(idField);
-        idField.setColumns(10);
 
         JLabel lblEmail = new JLabel("E-mail:");
         lblEmail.setBounds(29, 120, 120, 14);
@@ -63,9 +66,8 @@ public class MainGUI {
         frame.getContentPane().add(lblEmail);
 
         emaField = new JTextField();
-        emaField.setBounds(150, 117, 200, 28);
+        emaField.setBounds(150, 117, 250, 28);
         frame.getContentPane().add(emaField);
-        emaField.setColumns(10);
 
         JLabel lblPhone = new JLabel("Phone:");
         lblPhone.setBounds(29, 160, 120, 14);
@@ -74,86 +76,143 @@ public class MainGUI {
         frame.getContentPane().add(lblPhone);
 
         phonField = new JTextField();
-        phonField.setBounds(150, 157, 200, 28);
+        phonField.setBounds(150, 157, 250, 28);
         frame.getContentPane().add(phonField);
-        phonField.setColumns(10);
 
-        JLabel lblNewLabel_2 = new JLabel("Course Type:");
-        lblNewLabel_2.setBounds(29, 200, 120, 14);
-        lblNewLabel_2.setFont(setFont);
-        lblNewLabel_2.setForeground(Color.white);
-        frame.getContentPane().add(lblNewLabel_2);
+        JLabel lblCourse = new JLabel("Course Type:");
+        lblCourse.setBounds(29, 200, 120, 14);
+        lblCourse.setFont(setFont);
+        lblCourse.setForeground(Color.white);
+        frame.getContentPane().add(lblCourse);
 
         courseTypeComboBox = new JComboBox<>(CourseType.values());
-        courseTypeComboBox.setBounds(150, 197, 200, 28);
+        courseTypeComboBox.setBounds(150, 197, 250, 28);
         frame.getContentPane().add(courseTypeComboBox);
 
-        
-
-        JButton btnSave = new JButton("Save to File");
-        btnSave.setBounds(29, 260, 150, 25);
+        JButton btnSave = new JButton("Save");
+        btnSave.setBounds(50, 320, 100, 30);
         btnSave.setBackground(Color.GREEN);
         frame.getContentPane().add(btnSave);
-        btnSave.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                saveToFile();
-            }
-        });
+        btnSave.addActionListener(e -> saveStudent());
 
-        JButton btnRetrieve = new JButton("Retrieve from File");
-        btnRetrieve.setBounds(200, 260, 150, 25);
+        JButton btnSearch = new JButton("Search");
+        btnSearch.setBounds(170, 320, 100, 30);
+        btnSearch.setBackground(Color.YELLOW);
+        frame.getContentPane().add(btnSearch);
+        btnSearch.addActionListener(e -> searchStudent());
+
+        JButton btnUpdate = new JButton("Update");
+        btnUpdate.setBounds(290, 320, 100, 30);
+        btnUpdate.setBackground(Color.ORANGE);
+        frame.getContentPane().add(btnUpdate);
+        btnUpdate.addActionListener(e -> updateStudent());
+
+        JButton btnRetrieve = new JButton("Retrieve");
+        btnRetrieve.setBounds(410, 320, 100, 30);
         btnRetrieve.setBackground(Color.BLUE);
         btnRetrieve.setForeground(Color.WHITE);
         frame.getContentPane().add(btnRetrieve);
-        btnRetrieve.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                retrieveFromFile();
+        btnRetrieve.addActionListener(e -> retrieveStudents());
+    }
+
+    private void saveStudent() {
+        Student student = new Student(
+                nameField.getText(),
+                idField.getText(),
+                (CourseType) courseTypeComboBox.getSelectedItem(),
+                emaField.getText(),
+                phonField.getText()
+        );
+
+        studentList.add(student);
+        saveList();
+        JOptionPane.showMessageDialog(frame, "Student saved successfully.");
+        clearForm();
+    }
+
+    private void updateStudent() {
+        if (!isEditMode || editingIndex == -1) {
+            JOptionPane.showMessageDialog(frame, "Please search a student by ID first.");
+            return;
+        }
+
+        Student updatedStudent = new Student(
+                nameField.getText(),
+                idField.getText(),
+                (CourseType) courseTypeComboBox.getSelectedItem(),
+                emaField.getText(),
+                phonField.getText()
+        );
+
+        studentList.set(editingIndex, updatedStudent);
+        saveList();
+        JOptionPane.showMessageDialog(frame, "Student info updated successfully.");
+        isEditMode = false;
+        editingIndex = -1;
+        clearForm();
+    }
+
+    private void searchStudent() {
+        String id = idField.getText();
+        for (int i = 0; i < studentList.size(); i++) {
+            if (studentList.get(i).getStudentId().equals(id)) {
+                Student s = studentList.get(i);
+                nameField.setText(s.getStudentName());
+                emaField.setText(s.getStudentEmail());
+                phonField.setText(s.getphoneNumber());
+                courseTypeComboBox.setSelectedItem(s.getCourseType());
+                isEditMode = true;
+                editingIndex = i;
+                JOptionPane.showMessageDialog(frame, "Student found. Now click Update after editing.");
+                return;
             }
-        });
+        }
+        JOptionPane.showMessageDialog(frame, "Student ID not found.");
     }
 
-    private void saveToFile() {
+    private void retrieveStudents() {
+        StringBuilder all = new StringBuilder();
+        for (Student s : studentList) {
+            all.append("Name: ").append(s.getStudentName()).append("\n")
+                .append("ID: ").append(s.getStudentId()).append("\n")
+                .append("Email: ").append(s.getStudentEmail()).append("\n")
+                .append("Phone: ").append(s.getphoneNumber()).append("\n")
+                .append("Course Type: ").append(s.getCourseType()).append("\n\n");
+        }
+        JOptionPane.showMessageDialog(frame, all.toString());
+    }
+
+    private void clearForm() {
+        nameField.setText("");
+        idField.setText("");
+        emaField.setText("");
+        phonField.setText("");
+        courseTypeComboBox.setSelectedIndex(0);
+    }
+
+    private void saveList() {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("hello.txt"))) {
-            Student student = new Student(nameField.getText(), idField.getText(), (CourseType) courseTypeComboBox.getSelectedItem(),
-            emaField.getText(), phonField.getText()
-            );
-            out.writeObject(student);
-            JOptionPane.showMessageDialog(frame, "Student data saved to file successfully.");
-        } catch (IOException | NumberFormatException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "Error saving data to file." + ex.getMessage());
+            out.writeObject(studentList);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    private void retrieveFromFile() {
+    private void loadList() {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("hello.txt"))) {
-            Student savedStudent = (Student) in.readObject();
-            System.out.println(savedStudent); 
-            displayStudentDetails(savedStudent);
-        } catch (IOException | ClassNotFoundException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "Error retrieving data from file." + ex.getMessage());
+            studentList = (List<Student>) in.readObject();
+        } catch (Exception e) {
+            studentList = new ArrayList<>();
         }
-    }
-
-    private void displayStudentDetails(Student student) {
-        JOptionPane.showMessageDialog(frame, "Student Details:\n" +
-                "Name: " + student.getStudentName() +
-                "\nID: " + student.getStudentId() +
-                "\nEmail: " + student.getStudentEmail() +
-                "\nPhone: " + student.getphoneNumber() +
-                "\nCourse Type: " + student.getCourseType());
     }
 
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    MainGUI window = new MainGUI();
-                    window.frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        EventQueue.invokeLater(() -> {
+            try {
+                MainGUI window = new MainGUI();
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
