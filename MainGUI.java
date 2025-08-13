@@ -25,6 +25,7 @@ public class MainGUI {
     public MainGUI() {
         initialize();
         loadList();
+        
     }
 
     private void initialize() {
@@ -136,7 +137,21 @@ public class MainGUI {
             }
         });
 
+
+        // Logout button
+        JButton btnExit = new JButton("Logout");
+        btnExit.setBounds(550, 375, 85, 22);
+        btnExit.setBackground(Color.WHITE);
+        btnExit.setForeground(Color.BLACK);
+        frame.getContentPane().add(btnExit);
+        btnExit.addActionListener(e -> {
+            frame.dispose();
+            new LoginGUI(); // Go back to Login
+        });
+
         applyTheme(); // Initial theme
+        frame.setVisible(true);
+
     }
 
     private void applyTheme() {
